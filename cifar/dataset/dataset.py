@@ -56,7 +56,7 @@ def load_data(type='both',dataset='cifar10',data_path='/data',batch_size = 256,b
 
         trainset = data['name'](root=data_path,
                                     train=True,
-                                    download=False,
+                                    download=True,
                                     transform=transform1);
         trainloader = DataLoader(
             trainset,
@@ -67,7 +67,7 @@ def load_data(type='both',dataset='cifar10',data_path='/data',batch_size = 256,b
 
         testset = data['name'](root=data_path,
                                 train=False,
-                                download=False,
+                                download=True,
                                 transform=transform2);
         testloader = DataLoader(
             testset,
