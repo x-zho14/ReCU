@@ -50,14 +50,14 @@ class ProgressMeter(object):
         for meter in self.meters:
             avg = meter.avg
             val = meter.val
-            if meter.write_val:
-                writer.add_scalar(
-                    f"{prefix}/{meter.name}_val", val, global_step=global_step
-                )
-            if meter.write_avg:
-                writer.add_scalar(
-                    f"{prefix}/{meter.name}_avg", avg, global_step=global_step
-                )
+
+            writer.add_scalar(
+                f"{prefix}/{meter.name}_val", val, global_step=global_step
+            )
+
+            writer.add_scalar(
+                f"{prefix}/{meter.name}_avg", avg, global_step=global_step
+            )
 
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
