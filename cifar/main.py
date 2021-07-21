@@ -250,8 +250,8 @@ def main():
 
 
 def forward(data_loader, model, criterion, epoch=0, training=True, optimizer=None, writer=None):
-    batch_time = AverageMeter("bt", ":.3f"))
-    data_time = AverageMeter("dt", ":.3f"))
+    batch_time = AverageMeter("bt", ":.3f")
+    data_time = AverageMeter("dt", ":.3f")
     losses = AverageMeter("Loss", ":.3f")
     top1 = AverageMeter("Acc@1", ":6.2f")
     top5 = AverageMeter("Acc@5", ":6.2f")
