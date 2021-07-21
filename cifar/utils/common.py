@@ -5,6 +5,8 @@ import shutil
 import torch.nn as nn
 import numpy as np
 import datetime
+from torch.utils.tensorboard import SummaryWriter
+
 
 def setup_logging(log_file='log.txt',filemode='w'):
     """Setup logging configuration
@@ -35,6 +37,32 @@ def save_checkpoint(state, is_best, path='.', filename='checkpoint.pth.tar', sav
     if save_all:
         shutil.copyfile(filename, os.path.join(
             path, 'checkpoint_epoch_%s.pth.tar' % state['epoch']))
+
+class ProgressMeter(object):
+    def __init__(self, num_batches, meters, prefix=""):
+        self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
+        self.meters = meters
+        self.prefix = prefix
+
+    def write_to_tensorboard(
+        self, writer: SummaryWriter, prefix="train", global_step=None
+    ):
+        for meter in self.meters:
+            avg = meter.avg
+            val = meter.val
+            if meter.write_val:
+                writer.add_scalar(
+                    f"{prefix}/{meter.name}_val", val, global_step=global_step
+                )
+            if meter.write_avg:
+                writer.add_scalar(
+                    f"{prefix}/{meter.name}_avg", avg, global_step=global_step
+                )
+
+    def _get_batch_fmtstr(self, num_batches):
+        num_digits = len(str(num_batches // 1))
+        fmt = "{:" + str(num_digits+2) + "d}"
+        return "[" + fmt + "/" + fmt.format(num_batches) + "]"
 
 
 class AverageMeter(object):

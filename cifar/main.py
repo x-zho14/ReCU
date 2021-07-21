@@ -14,6 +14,8 @@ from utils import *
 from modules import *
 from datetime import datetime 
 import dataset
+from torch.utils.tensorboard import SummaryWriter
+
 
 
 def main():
@@ -171,6 +173,7 @@ def main():
         if isinstance(module,nn.Conv2d):
             conv_modules.append(module)
 
+    writer = SummaryWriter("./")
 
     for epoch in range(args.start_epoch+1, args.epochs):
         time_start = datetime.now()
@@ -189,7 +192,7 @@ def main():
 
         #* training
         train_loss, train_prec1, train_prec5 = train(
-            train_loader, model, criterion, epoch, optimizer)
+            train_loader, model, criterion, epoch, optimizer, writer)
 
         #* adjust Lr
         if epoch >= 4 * args.warm_up:
@@ -198,7 +201,7 @@ def main():
         #* evaluating
         with torch.no_grad():
             val_loss, val_prec1, val_prec5 = validate(
-                val_loader, model, criterion, epoch)
+                val_loader, model, criterion, epoch, writer)
 
         #* remember best prec
         is_best = val_prec1 > best_prec1
@@ -246,12 +249,19 @@ def main():
                      .format(best_epoch+1, prec1=best_prec1, loss=best_loss))
 
 
-def forward(data_loader, model, criterion, epoch=0, training=True, optimizer=None):
+def forward(data_loader, model, criterion, epoch=0, training=True, optimizer=None, writer=None):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
     top1 = AverageMeter()
     top5 = AverageMeter()
+    l = [losses, top1, top5]
+
+    progress = ProgressMeter(
+        len(data_loader),
+        l,
+        prefix=f"Epoch: [{epoch}]",
+    )
 
     end = time.time()
     for i, (inputs, target) in enumerate(data_loader):
@@ -301,20 +311,20 @@ def forward(data_loader, model, criterion, epoch=0, training=True, optimizer=Non
                              batch_time=batch_time,
                              data_time=data_time, loss=losses,
                              top1=top1, top5=top5))
-
+    progress.write_to_tensorboard()
     return losses.avg, top1.avg, top5.avg
 
 
-def train(data_loader, model, criterion, epoch, optimizer):
+def train(data_loader, model, criterion, epoch, optimizer, writer):
     model.train()
     return forward(data_loader, model, criterion, epoch,
-                   training=True, optimizer=optimizer)
+                   training=True, optimizer=optimizer, writer=writer)
 
 
-def validate(data_loader, model, criterion, epoch):
+def validate(data_loader, model, criterion, epoch, writer):
     model.eval()
     return forward(data_loader, model, criterion, epoch,
-                   training=False, optimizer=None)
+                   training=False, optimizer=None, writer=writer)
 
 
 if __name__ == '__main__':
