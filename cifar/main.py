@@ -311,7 +311,7 @@ def forward(data_loader, model, criterion, epoch=0, training=True, optimizer=Non
                              batch_time=batch_time,
                              data_time=data_time, loss=losses,
                              top1=top1, top5=top5))
-    progress.write_to_tensorboard(writer, prefix='TRAINING' if training else 'EVALUATING', global_step=epoch)
+    progress.write_to_tensorboard(writer, prefix='train' if training else 'test', global_step=epoch)
     return losses.avg, top1.avg, top5.avg
 
 
