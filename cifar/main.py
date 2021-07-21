@@ -252,9 +252,9 @@ def main():
 def forward(data_loader, model, criterion, epoch=0, training=True, optimizer=None, writer=None):
     batch_time = AverageMeter()
     data_time = AverageMeter()
-    losses = AverageMeter()
-    top1 = AverageMeter()
-    top5 = AverageMeter()
+    losses = AverageMeter("Loss", ":.3f")
+    top1 = AverageMeter("Acc@1", ":6.2f")
+    top5 = AverageMeter("Acc@5", ":6.2f")
     l = [losses, top1, top5]
 
     progress = ProgressMeter(
